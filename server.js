@@ -3,6 +3,7 @@ let cors=require('cors');
 let mongoose=require("mongoose");
 let jwt=require("jsonwebtoken");
 let {model}=require("./Model");
+const nodemailer = require('nodemailer');
 let app=express();
 app.use(cors());
 app.use(express.urlencoded({extended:true}));
@@ -40,20 +41,40 @@ app.post('/signUp',async (req,res)=>{
         res.sendStatus(500);
     }
 });
-app.post('/forgot',async(req,res)=>{
-    console.log("requesting",req.body);
-    let email=await model.findOne({email:req.body.email});
-    try{
-    if(email!=null){
-        console.log(email.email);
-        res.status(200).json({password:jwt.verify(email.password,email.email)});
-    }
-    else{  
-        res.sendStatus(401);
-    }
-    }catch(err){
+// Forgot password route
+app.post('/forgot', async (req, res) => {
+    console.log("requesting", req.body);
+    let user = await model.findOne({ email: req.body.email });
+    try {
+        if (user) {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'sanj25524@gmail.com',
+                    pass: 'jidj oapr hkgi bnpv' // Use the 16-character app password generated from Google
+                }
+            });
+
+            async function main(email, password) {
+                const info = await transporter.sendMail({
+                    from: '"From Sanjay Password Regarding..." <sanj25524@gmail.com>',
+                    to: email,
+                    subject: "Password Recovery",
+                    text: `Your password is: ${password}`,
+                    html: `<b>Your password is: ${password}</b>`,
+                });
+
+                console.log("Message sent: %s", info.messageId);
+            }
+
+            main(req.body.email, jwt.verify(user.password, user.email));
+            res.status(201).json({ "message": "Email sent successfully" });
+        } else {
+            res.status(401).json({ "message": "User not found" });
+        }
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
-})
+});
 mongoose.connect("mongodb+srv://sanjaysoman46:sanjay123@aspirenex.ibkw6hj.mongodb.net/?retryWrites=true&w=majority&appName=AspireNex").then(()=>app.listen(8010,()=>console.log("Login Server COnnected"))).catch(err=>console.log(err,"Login Server Error"))
