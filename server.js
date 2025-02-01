@@ -77,4 +77,4 @@ app.post('/forgot', async (req, res) => {
         res.sendStatus(500);
     }
 });
-mongoose.connect("mongodb+srv://sanjaysoman46:sanjay123@aspirenex.ibkw6hj.mongodb.net/?retryWrites=true&w=majority&appName=AspireNex").then(()=>app.listen(8011,()=>console.log("Login Server COnnected"))).catch(err=>console.log(err,"Login Server Error"))
+mongoose.connect("mongodb+srv://sanjaysoman46:sanjay123@aspirenex.ibkw6hj.mongodb.net/?retryWrites=true&w=majority&appName=AspireNex").then(()=>app.listen(8010,()=>console.log("Login Server COnnected"))).catch(err=>console.log(err,"Login Server Error"))
